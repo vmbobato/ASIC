@@ -1,0 +1,107 @@
+Fine-tuning SegFormer B5 for Land Cover Classification on DeepGlobe Dataset
+
+Introduction
+
+In this project, I implemented a deep learning pipeline to fine-tune a SegFormer B5 model for semantic segmentation 
+on the DeepGlobe land cover dataset. This blog outlines the architecture, enhancements, optimization techniques, and 
+evaluation strategies used to improve model performance, with the goal of accurate land classification and pixel-wise area coverage estimation.
+
+Dataset and Problem Overview
+
+The DeepGlobe dataset consists of satellite images and their corresponding masks, each pixel labeled as one of the following land cover classes:
+1. Urban land
+2. Agriculture land
+3. Rangeland
+4. Forest land
+5. Water
+6. Barren land
+7. Unknown
+
+The objective is to predict a segmentation mask for each image that accurately identifies the class of every pixel, and to evaluate the p
+roportion of each class (area coverage) within the image.
+
+Model Selection: SegFormer B5
+
+SegFormer is a Transformer-based segmentation model that uses a hierarchical encoder with efficient self-attention mechanisms. 
+The B5 variant is the largest among its configurations, offering high accuracy with the tradeoff of increased computation.
+
+Why SegFormer B5?
+
+ - Transformer backbone (ViT) is effective for satellite images
+ - Pretrained on ADE20K, transferable to land cover tasks
+ - Strong baseline performance for semantic segmentation
+
+Data Pipeline and Augmentation
+
+A custom SegmentationDataset class loads image and mask pairs, applies transformations, and converts RGB masks to class indices.
+
+Data Augmentation
+
+To improve generalization and reduce overfitting:
+ - RandomHorizontalFlip, RandomVerticalFlip → improves spatial invariance
+ - RandomRotation → simulates various viewing angles
+ - ColorJitter, GaussianBlur → makes the model robust to brightness, contrast, and weather changes
+
+These augmentations are only applied to the training set, keeping validation data clean for reliable evaluation.
+
+RGB Mask Conversion
+
+The dataset provides masks in RGB colors. These are converted into class indices using a dictionary mapping 
+specific RGB tuples to class IDs, allowing the model to learn using categorical targets.
+
+Loss Functions
+
+A combination of three loss functions is used:
+
+1. Cross Entropy Loss
+    Handles multiclass classification. I used label_smoothing and class weights to reduce overconfidence and address class imbalance.
+
+2. Dice Loss
+    Measures overlap between predicted and true masks. It directly optimizes for better IoU and handles imbalanced datasets well.
+
+3. Focal Loss
+    Places more focus on hard examples by penalizing easy predictions, further helping with class imbalance.
+
+Loss Combination
+
+loss = 0.33 * dice_loss + 0.33 * cross_entropy_loss + 0.34 * focal_loss
+
+Dynamic Class Weights
+
+To address class imbalance, I computed class frequencies from the training set and used inverse frequency to derive weights. 
+This encourages the model to pay more attention to underrepresented classes like "water" or "barren land".
+
+class_weights = total / (num_classes * class_counts + 1e-6)
+
+Learning Rate Scheduler
+
+I added ReduceLROnPlateau, a scheduler that dynamically adjusts the learning rate if performance stalls.
+
+Why?
+ - Prevents overfitting
+ - Helps converge faster
+ - Reduces LR if no improvement in validation mIoU after 3 epochs
+
+Evaluation Metrics
+
+Each epoch, I computed:
+
+ - Pixel Accuracy: Proportion of correctly classified pixels
+ - IoU per class: Intersection over Union, key metric for segmentation
+ - Mean IoU: Average across all classes
+ - Pixel Coverage: Proportion of image each class occupies
+
+Model Saving and Logging
+
+The best model (highest validation mIoU) is saved as best_model_b5.pth, and training statistics are written to a CSV file for post-analysis.
+
+Image Size and Batch Size
+
+Image size: 640x640 (aligned with B5 pretraining resolution)
+Batch size: 4 (balances GPU memory and training speed)
+
+Final Notes
+
+This implementation combines powerful pretraining, advanced loss functions, data augmentation, and class balancing techniques to maximize 
+segmentation accuracy.
+
