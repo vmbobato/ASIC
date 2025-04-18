@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASIC Blog - Project Documentation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-satellite-dish"></i>
+                <span>ASIC</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/blog" class="nav-link active">
+                    <i class="fas fa-blog"></i>
+                    <span>Blog</span>
+                </a>
+                <a href="/demo" class="nav-link">
+                    <i class="fas fa-video"></i>
+                    <span>Demo</span>
+                </a>
+                <a href="https://github.com/vmbobato" target="_blank" class="nav-link github-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="blog-content">
+            <h1>ASIC Project Documentation</h1>
+            
+            <section class="blog-section">
+                <h2>Introduction</h2>
+                <p>ASIC (AI for Satellite Image Classification) is an innovative project that leverages artificial intelligence to analyze and classify satellite imagery. This blog post provides an in-depth look at the project's architecture, implementation, and capabilities.</p>
+            </section>
+
+            <section class="blog-section">
+                <h2>Project Overview</h2>
+                <p>The ASIC project was developed to address the growing need for automated satellite image analysis. Our solution combines state-of-the-art machine learning techniques with a user-friendly web interface to provide accurate and efficient image classification.</p>
+            </section>
+
+            <section class="blog-section">
+                <h2>Technical Architecture</h2>
+                <h3>Frontend</h3>
+                <ul>
+                    <li>Modern web interface built with HTML5, CSS3, and JavaScript</li>
+                    <li>Responsive design for optimal viewing on all devices</li>
+                    <li>Interactive image upload and preview functionality</li>
+                </ul>
+
+                <h3>Backend</h3>
+                <ul>
+                    <li>Python-based server using Flask framework</li>
+                    <li>Advanced image processing algorithms</li>
+                    <li>Machine learning model for image classification</li>
+                </ul>
+            </section>
+
+            <section class="blog-section">
+                <h2>Features</h2>
+                <ul>
+                    <li>Real-time image processing</li>
+                    <li>High-accuracy classification</li>
+                    <li>User-friendly interface</li>
+                    <li>Detailed analysis results</li>
+                </ul>
+            </section>
+
+            <section class="blog-section">
+                <h2>Future Developments</h2>
+                <p>We are continuously working on improving ASIC with new features and capabilities. Planned updates include:</p>
+                <ul>
+                    <li>Enhanced classification algorithms</li>
+                    <li>Batch processing capabilities</li>
+                    <li>Advanced visualization tools</li>
+                    <li>API integration options</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 ASIC - Advanced Satellite Image Classification by Vinicius Bobato, Andreas Bardram, Theo Link</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 

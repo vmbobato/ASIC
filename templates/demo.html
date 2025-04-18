@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASIC Demo - Project Demonstration</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-satellite-dish"></i>
+                <span>ASIC</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/blog" class="nav-link">
+                    <i class="fas fa-blog"></i>
+                    <span>Blog</span>
+                </a>
+                <a href="/demo" class="nav-link active">
+                    <i class="fas fa-video"></i>
+                    <span>Demo</span>
+                </a>
+                <a href="https://github.com/vmbobato" target="_blank" class="nav-link github-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="demo-content">
+            <h1>ASIC Project Demonstration</h1>
+            
+            <section class="demo-section">
+                <div class="video-container">
+                    <iframe 
+                        width="100%" 
+                        height="600" 
+                        src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
+                        title="ASIC Project Demonstration" 
+                        frameborder="0" 
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+                        allowfullscreen>
+                    </iframe>
+                </div>
+            </section>
+
+            <section class="demo-section">
+                <h2>Demo Overview</h2>
+                <p>This demonstration video showcases the key features and capabilities of the ASIC project. Watch as we walk through the process of uploading and analyzing satellite imagery using our AI-powered classification system.</p>
+            </section>
+
+            <section class="demo-section">
+                <h2>Key Features Demonstrated</h2>
+                <ul>
+                    <li>Image upload and preview functionality</li>
+                    <li>Real-time processing capabilities</li>
+                    <li>Classification results visualization</li>
+                    <li>User interface navigation</li>
+                </ul>
+            </section>
+        </div>
+    </div>
+
+    <footer>
+        <p>© 2025 ASIC - Advanced Satellite Image Classification by Vinicius Bobato, Andreas Bardram, Theo Link</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
