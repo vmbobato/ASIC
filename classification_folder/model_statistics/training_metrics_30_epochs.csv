@@ -1,0 +1,1 @@
+Epoch,Pixel_Accuracy,IoU_urban_land,IoU_agriculture_land,IoU_rangeland,IoU_forest_land,IoU_water,IoU_barren_land,IoU_unknown,Mean_IoU_wo_Unknown
