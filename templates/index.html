@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASIC - AI for Satellite Image Classification</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-satellite-dish"></i>
+                <span>ASIC</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link active">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/blog" class="nav-link">
+                    <i class="fas fa-blog"></i>
+                    <span>Blog</span>
+                </a>
+                <a href="/demo" class="nav-link">
+                    <i class="fas fa-video"></i>
+                    <span>Demo</span>
+                </a>
+                <a href="https://github.com/vmbobato" target="_blank" class="nav-link github-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-satellite-dish"></i>
+                <h1>ASIC</h1>
+            </div>
+            <p class="subtitle">AI for Satellite Image Classification</p>
+            <p class="description">Upload a satellite image to run segmentation and get detailed analysis</p>
+        </header>
+
+        <main>
+            <section class="upload-section">
+                <div class="upload-container">
+                    <form id="uploadForm">
+                        <div class="drop-zone">
+                            <div class="upload-content">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>Drag & drop your image here or click to browse</p>
+                                <input type="file" name="image" id="image" accept="image/*" required>
+                            </div>
+                        </div>
+                        <button type="submit" class="process-btn">
+                            <i class="fas fa-magic"></i> Process Image
+                        </button>
+                    </form>
+                </div>
+            </section>
+
+            <section class="results-section">
+                <div class="results-container">
+                    <div class="image-container">
+                        <h3>Original Image</h3>
+                        <img id="originalImage" src="" alt="Original Image" style="display: none;">
+                    </div>
+                    <div class="image-container">
+                        <h3>Segmented Image</h3>
+                        <img id="segmentedImage" src="" alt="Segmented Image" style="display: none;">
+                    </div>
+                </div>
+            </section>
+
+            <section class="console-section">
+                <div class="console-header">
+                    <h3><i class="fas fa-terminal"></i> Processing Console</h3>
+                </div>
+                <div id="consoleOutput">
+                    > Ready to process image... Select an image and press "process Image" to being.
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>© 2025 ASIC - Artificial Intelligence for Satellite Image Classification by Vinicius Bobato, Andreas Bardram, Theo Lin</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

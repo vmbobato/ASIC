@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASIC Blog - Project Documentation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <nav class="main-nav">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <i class="fas fa-satellite-dish"></i>
+                <span>ASIC</span>
+            </div>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Home</span>
+                </a>
+                <a href="/blog" class="nav-link active">
+                    <i class="fas fa-blog"></i>
+                    <span>Blog</span>
+                </a>
+                <a href="/demo" class="nav-link">
+                    <i class="fas fa-video"></i>
+                    <span>Demo</span>
+                </a>
+                <a href="https://github.com/vmbobato" target="_blank" class="nav-link github-link">
+                    <i class="fab fa-github"></i>
+                    <span>GitHub</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="blog-content">
+            <h1>ASIC - AI for satelite image classification</h1>
+            
+            <section class="blog-section">
+                <h2>Overview</h2>
+                <p> Measuring the size of land areas like cities, forests, and ice formations is challenging, especially when 
+                    accurate data over time is required. Our project aims to use AI and satellite imagery to automate this process.
+                    By leveraging image recognition technology, our system will detect and classify different land types—urban 
+                    areas, forests, ice, and farmland—directly from satellite images. AI for Satellite Image Classification is a 
+                    software project that uses deep learning for pixel-level classification of satellite imagery. Its main goal 
+                    is to determine the proportion of various land types in an image by performing image segmentation and 
+                    calculating their relative area coverage. That could make this tool useful for anyone from city planners 
+                    monitoring urban growth to environmental researchers tracking deforestation or ice melting.</p>
+            </section>
+        
+            <section class="blog-section">
+                <h2>Motivation</h2>
+                <p>
+                    Land use maps are essential for informed decision making in fields like urban planning, agriculture, and 
+                    environmental science. City planners rely on up to date area measurements to manage infrastructure, zoning, 
+                    and services. Agricultural managers need to monitor crop rotations and estimate yields. Environmental researchers 
+                    track deforestation, wetlands loss, and ice meltings. These people could find a fine-tuned model for their
+                    images useful.
+                </p>
+            </section>            
+        
+            <section class="blog-section">
+                <h2>Related Work</h2>
+                <p>...</p>
+            </section>
+        
+            <section class="blog-section">
+                <h2>Problem Set-Up</h2>
+                <p>
+                    Our goal was to treat this task as an image segmentation problem, one where each individual pixel in a 
+                    satellite image is assigned a class label corresponding to a land type. We wanted to extract more detailed 
+                    information by looking at what's happening at the pixel level to give more useful meassurements for people.
+                </p>
+                <p>
+                    There is a lot of existing models that perform well in general image segmentation, so we wanted to use these
+                    for our project. The main idea was to leverage these powerful mdeols and fine-tune them so that they could 
+                    accurately recognize and quantify land types like urban areas, forests, farmland, and bodies of water.
+                </p>
+                <p>
+                    We want our software to output something interpretable and actionable. The final result should be a 
+                    breakdown of the land composition in an image, showing what percentage of the image is made up of each land type. 
+                    This would make the tool valuable not only for analysis but also for tracking changes over time.
+                </p>
+            </section>            
+        
+            <section class="blog-section">
+                <h2>Approach</h2>
+                <p>
+                    To get started, we looked at a few image segmentation models to figure out which one would work best for our 
+                    use case. The models we tested included SAM2, DeepLabV3+ with a ResNet50 encoder, and SegFormerB2.
+                </p>
+                <p>
+                    We landed on the SegFormerB2, because of it's pixel classification capabilities and overall precision. We tried to combine SAM2
+                    and DeepLabV3+ with a ResNet50 encoder, where we first segmented an image and then labeled the segmented areas, but the SegFormerB2
+                    overall performed better. Next step was to fine-tune it using our satellite image dataset. We adapted the training process 
+                    to better fit the kind of images we were dealing with and the specific land-type labels we wanted the model to learn.
+                </p>
+                <p>
+                    After training, we used the model to segment new satellite images. From those segmentation maps, we could then calculate the 
+                    percentage of each land type in the image, giving us the kind of output that's actually useful.
+                </p>
+            </section>            
+        
+            <section class="blog-section">
+                <h2>Dataset</h2>
+                <p>
+                    For training and evaluation, we used the DeepGlobe 2018 dataset. It's a dataset with 803 samples, 
+                    each made up of a satellite image, a ground truth segmentation map, and a mask. 
+                </p>
+                <p>
+                    The dataset covers 7 land-type classes, each one represented by a different color in the mask:
+                </p>
+                <ul>
+                    <li>[0] Urban Land - Cyan (0, 255, 255)</li>
+                    <li>[1] Agriculture Land - Yellow (255, 255, 0)</li>
+                    <li>[2] Rangeland - Magenta (255, 0, 255)</li>
+                    <li>[3] Forest Land - Green (0, 255, 0)</li>
+                    <li>[4] Water - Blue (0, 0, 255)</li>
+                    <li>[5] Barren Land - White (255, 255, 255)</li>
+                    <li>[6] Unknown - Black (0, 0, 0)</li>
+                </ul>
+                <p>
+                    These color-coded masks made it easier to visualize what the model was learning and to evaluate how well it was doing during training. 
+                    To add some visual verification other than the pixel accuracy, IOU-values and other evaluation metrics.
+                </p>
+            </section>
+        
+            <section class="blog-section">
+                <h2>Implementation</h2>
+                <p>
+                    For the model, we used <strong>SegFormer B2</strong>, which is a transformer-based architecture that comes 
+                    pretrained on the ADE20K dataset. This were the model that performed best as a baseline, especially when it 
+                    came to pixel-level accuracy. We trained it with an input size of 512x512 and used a batch size of 4.
+                </p>
+                <p>
+                    We set up a custom data pipeline that converted our RGB mask images into class labels that the model could 
+                    learn from. To help the model generalize better, we added some standard data augmentations during training, 
+                    things like flipping, rotating, color jitter, and gaussian blur.
+                </p>
+                <p>
+                    We did combination of three loss types: Cross Entropy, Dice Loss, and Focal Loss. The final loss formula looked like this:
+                </p>
+                <p><code>Loss = 0.33 * Dice + 0.33 * CrossEntropy + 0.34 * Focal</code></p>
+                <p>
+                    Training-wise, we started with general optimization and added some checks to avoid overfitting. If the model didn't improve 
+                    for 3 epochs, we reduced the learning rate, and then had early stopping after reducing the learning rate.
+                </p>
+            </section>            
+        
+            <section class="blog-section">
+                <h2>Experimental Results</h2>
+                <p>
+                    We evaluated the model's performance using both visual inspection and quantitative metrics like pixel accuracy, Intersection-over-Union (IoU) for each class, mean IoU, and class coverage. The best model checkpoint was saved based on the highest mean IoU score.
+                </p>
+                <p>
+                    Below are some graphs we generated that show how the model performed across different training epochs.
+                </p>
+                <div style="display: flex; justify-content: center; margin: 20px 0;">
+                    <img src="{{ url_for('static', filename='charts.png') }}" alt="Training Performance Charts" style="max-width: 100%; border-radius: 8px;">
+                </div>                
+            </section>            
+        
+            <section class="blog-section">
+                <h2>Demo</h2>
+                <p>Check out the <a href="/demo">Demo</a> section of this site to try the ASIC model in action. You can upload satellite images and view land type segmentation and percentage breakdown in real-time.</p>
+            </section>
+        
+            <section class="blog-section">
+                <h2>Conclusion</h2>
+                <p>
+                    ASIC shows that modern image segmentation models can be adapted to work well with satellite imagery. The software
+                    can break down land types in an image and give useful stats about their area. There's still room to improve, 
+                    especially in terms of accuracy, but the current results are a solid starting point. We would definitely need to 
+                    get better IOU and pixel accuracy if this was something that should be implementated for city-, forest-, farmland- 
+                    monitoring.
+                </p>
+            </section>            
+        </div>        
+    </div>
+
+    <footer>
+        <p>© 2025 ASIC - Advanced Satellite Image Classification by Vinicius Bobato, Andreas Bardram, Theo Lin</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 
