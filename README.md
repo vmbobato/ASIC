@@ -20,7 +20,7 @@ This project is a web-based application that allows users to upload satellite im
 
 ### Backend
 - **Flask** – lightweight Python web server  
-- **PyTorch** – to load and run the SAM2 model  
+- **PyTorch** – to load and run the Segformer B2 model  
 - **Segformer B2** – automatic mask generator for segmentation  
 - **NumPy**, **Pillow** – image handling  
 
@@ -31,6 +31,14 @@ This project is a web-based application that allows users to upload satellite im
 ### ML Models
 - **Segformer B2** – from by Nvidia  
 - **PyTorch & Torchvision** - for model implementation
+
+---
+
+## Dataset
+
+.
+
+---
 
 ## Steps to run ASIC
 Clone this repository into your desired location.
