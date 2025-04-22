@@ -22,7 +22,7 @@ This project is a web-based application that allows users to upload satellite im
 - **Flask** – lightweight Python web server  
 - **PyTorch** – to load and run the SAM2 model  
 - **Segformer B2** – automatic mask generator for segmentation  
-- **OpenCV**, **NumPy**, **Pillow** – image handling  
+- **NumPy**, **Pillow** – image handling  
 
 ### Frontend
 - **HTML/CSS/JS** – styled with a satellite-dashboard theme  
@@ -36,9 +36,24 @@ This project is a web-based application that allows users to upload satellite im
 Clone this repository into your desired location.
 
 `git clone https://github.com/ASIC.git`
+
+Download [b2-ade_30_epochs.pth](https://huggingface.co/vmbobato/ASIC/tree/main) from this HuggingFace repository and place it inside **classification_folder/model**
+
+Go to the repository location.
+
 `cd ASIC/`
+
+Install requirements.
+
 `pip install -r requiremnts.txt`
+
+Run the WebApp. 
+
 `python3 app.py`
+
+To connect to the WebApp open your browser and visit http://127.0.0.1:5000
+
+
 
 
 
