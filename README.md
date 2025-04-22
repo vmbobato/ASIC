@@ -49,7 +49,7 @@ Download [b2-ade_30_epochs.pth](https://huggingface.co/vmbobato/ASIC/tree/main) 
 
 Go to the repository location.
 
-`cd ASIC/`
+```cd ASIC/```
 
 Install requirements.
 
