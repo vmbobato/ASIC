@@ -5,10 +5,8 @@ from torchvision import transforms as T
 from transformers import SegformerForSemanticSegmentation, SegformerConfig
 import os
 
-print(os.getcwd())
-
-model_path = "classification_folder/models/saved_models/b2-ade_30_epochs.pth"
-config_path = "classification_folder/models/b2-ade-512-512/config.json"
+model_path = "classification_folder/models/b2-ade_30_epochs.pth"
+config_path = "classification_folder/models/config.json"
 OUTPUT_PATH = "output_segmentation/"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -40,7 +38,7 @@ model.load_state_dict(state_dict)
 model.eval().to(device)
 
 transform = T.Compose([
-    T.Resize((224, 224)),
+    T.Resize((512, 512)),
     T.ToTensor(),
     T.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
@@ -51,7 +49,7 @@ def compute_coverage(mask, num_classes=7):
     coverage = {}
     for class_id in range(num_classes):
         count = np.sum(mask == class_id)
-        percent = count / total_pixels * 100
+        percent = (count / total_pixels) * 100
         coverage[id2label[class_id]] = round(percent, 2)
     return coverage
 
