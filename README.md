@@ -43,21 +43,29 @@ This project is a web-based application that allows users to upload satellite im
 ## Steps to run ASIC
 Clone this repository into your desired location.
 
-`git clone https://github.com/ASIC.git`
+```
+git clone https://github.com/ASIC.git
+```
 
 Download [b2-ade_30_epochs.pth](https://huggingface.co/vmbobato/ASIC/tree/main) from this HuggingFace repository and place it inside **classification_folder/model**
 
 Go to the repository location.
 
-```cd ASIC/```
+```
+cd ASIC/
+```
 
 Install requirements.
 
-`pip install -r requiremnts.txt`
+```
+pip install -r requiremnts.txt
+```
 
 Run the WebApp. 
 
-`python3 app.py`
+```
+python3 app.py
+```
 
 To connect to the WebApp open your browser and visit http://127.0.0.1:5000
 
