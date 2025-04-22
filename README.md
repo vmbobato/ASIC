@@ -2,7 +2,7 @@
 
 This project is a web-based application that allows users to upload satellite images and receive a **segmented output** using [Segformer B2 ADE 20K](https://huggingface.co/nvidia/segformer-b2-finetuned-ade-512-512) model. It simulates an Earth observation tool where land cover types can be detected and visualized.
 
-> Future versions will classify each segmented region using a lightweight image classification model (e.g., ResNet50, MobileNetV2).
+> This work was also supported by Andreas Bardram and Theo Lin.
 
 ---
 
@@ -11,7 +11,8 @@ This project is a web-based application that allows users to upload satellite im
 - Upload a satellite image  
 - Segment regions using **SegFormerB2**  
 - Visualize the output overlaid on the image  
-- *(WIP)* Classify each region using a trained model  
+- Classify each region using a pretrained model
+- Calculate each segmented area and represent them in a percentage.
 
 ---
 
