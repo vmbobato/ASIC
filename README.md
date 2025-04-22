@@ -2,7 +2,7 @@
 
 This project is a web-based application that allows users to upload satellite images and receive a **segmented output** using [Segformer B2 ADE 20K](https://huggingface.co/nvidia/segformer-b2-finetuned-ade-512-512) model. It simulates an Earth observation tool where land cover types can be detected and visualized.
 
-> This work was also supported by Andreas Bardram and Theo Lin.
+> This was a team work in collaboration with Andreas Bardram and Theo Lin for our final project in CSCE 625 at Texas A&M University
 
 ---
 
