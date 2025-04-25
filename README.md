@@ -40,6 +40,14 @@ The [dataset](https://datasetninja.com/deepglobe) is already divided into train,
 
 ---
 
+## Application Diagram
+
+The diagram below shows the steps the application takes to segment and output the results.
+
+![Diagram](application_diagram.png)
+
+---
+
 ## Steps to run ASIC
 Clone this repository into your desired location.
 
