@@ -5,8 +5,8 @@ from torchvision import transforms as T
 from transformers import SegformerForSemanticSegmentation, SegformerConfig
 import os
 
-model_path = "classification_folder/models/b2-ade_30_epochs.pth"
-config_path = "classification_folder/models/config.json"
+model_path = "classification_folder/model/b2-ade_30_epochs.pth"
+config_path = "classification_folder/model/config.json"
 OUTPUT_PATH = "output_segmentation/"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
