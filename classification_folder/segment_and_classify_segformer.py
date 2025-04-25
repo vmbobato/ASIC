@@ -11,7 +11,7 @@ OUTPUT_PATH = "output_segmentation/"
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-
+# helper structures
 id2label = {
     0: "urban_land",
     1: "agriculture_land",
@@ -31,6 +31,7 @@ class_colors = {
     6: (0, 0, 0)
 }
 
+# load model
 config = SegformerConfig.from_json_file(config_path)
 model = SegformerForSemanticSegmentation(config)
 state_dict = torch.load(model_path, map_location=device)
@@ -38,23 +39,27 @@ model.load_state_dict(state_dict)
 model.eval().to(device)
 
 transform = T.Compose([
-    T.Resize((512, 512)),
+    T.Resize((240, 240)),
     T.ToTensor(),
     T.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
 ])
 
 
-def compute_coverage(mask, num_classes=7):
+def compute_coverage(mask : np.array, num_classes=7) -> dict:
+    """
+    Function to calculate coverage fo each class based on mask
+    Return percentage for each class in a dict {'urban' : 76.54}
+    """
     total_pixels = mask.size
     coverage = {}
     for class_id in range(num_classes):
         count = np.sum(mask == class_id)
-        percent = (count / total_pixels) * 100
+        percent = count / total_pixels * 100
         coverage[id2label[class_id]] = round(percent, 2)
     return coverage
 
 
-def get_masks(image_path):
+def get_masks(image_path : str):
     image = Image.open(image_path).convert("RGB")
     orig_size = image.size  # (W, H)
     input_tensor = transform(image).unsqueeze(0).to(device)
@@ -70,7 +75,7 @@ def get_masks(image_path):
         pred_mask = upsampled_logits.argmax(dim=1)[0].cpu().numpy()
     return pred_mask
 
-def run_analysis(mask, img_name):
+def run_analysis(mask, img_name) -> tuple[str, str]:
     file_name_only = os.path.splitext(img_name)[0]
     output_filename = f"{file_name_only}_segmented.png"
     output = ''
