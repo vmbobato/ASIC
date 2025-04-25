@@ -27,7 +27,7 @@
                     <i class="fas fa-video"></i>
                     <span>Demo</span>
                 </a>
-                <a href="https://github.com/vmbobato" target="_blank" class="nav-link github-link">
+                <a href="https://github.com/vmbobato/ASIC" target="_blank" class="nav-link github-link">
                     <i class="fab fa-github"></i>
                     <span>GitHub</span>
                 </a>
@@ -114,13 +114,13 @@
                     The dataset covers 7 land-type classes, each one represented by a different color in the mask:
                 </p>
                 <ul>
-                    <li>[0] Urban Land - Cyan (0, 255, 255)</li>
+                    <li>[0] Urban Land       - Cyan (0, 255, 255)</li>
                     <li>[1] Agriculture Land - Yellow (255, 255, 0)</li>
-                    <li>[2] Rangeland - Magenta (255, 0, 255)</li>
-                    <li>[3] Forest Land - Green (0, 255, 0)</li>
-                    <li>[4] Water - Blue (0, 0, 255)</li>
-                    <li>[5] Barren Land - White (255, 255, 255)</li>
-                    <li>[6] Unknown - Black (0, 0, 0)</li>
+                    <li>[2] Rangeland        - Magenta (255, 0, 255)</li>
+                    <li>[3] Forest Land      - Green (0, 255, 0)</li>
+                    <li>[4] Water            - Blue (0, 0, 255)</li>
+                    <li>[5] Barren Land      - White (255, 255, 255)</li>
+                    <li>[6] Unknown          - Black (0, 0, 0)</li>
                 </ul>
                 <p>
                     These color-coded masks made it easier to visualize what the model was learning and to evaluate how well it was doing during training. 
@@ -177,7 +177,16 @@
                     get better IOU and pixel accuracy if this was something that should be implementated for city-, forest-, farmland- 
                     monitoring.
                 </p>
-            </section>            
+            </section> 
+            
+            <section class="blog-section">
+                <h2>References</h2>
+                <ol>
+                    {% for citation in citations %}
+                    <li>{{ citation | safe }}</li>
+                    {% endfor %}
+                </ol>
+            </section>  
         </div>        
     </div>
 
