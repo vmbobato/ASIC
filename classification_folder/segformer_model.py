@@ -14,8 +14,8 @@ from safetensors.torch import load_file
 from tqdm import trange
 
 MODEL_NAME = 'b2'
-EPOCHS = 20
-IMAGE_SIZE = (240, 240)
+EPOCHS = 35
+IMAGE_SIZE = (512, 512)
 BATCH_SIZE = 4
 
 """
@@ -61,6 +61,7 @@ class SegmentationDataset(Dataset):
         self.image_size = image_size
         self.files = sorted([f for f in os.listdir(root_dir) if f.endswith("_sat.jpg")])
 
+        # Data agumentation, if statement to check whether the dataset is supposed to be augmented. 
         if augment:
             self.img_transform = T.Compose([
                 T.RandomResizedCrop(image_size, scale=(0.8, 1.2)),
@@ -109,6 +110,9 @@ class SegmentationDataset(Dataset):
 
 
 class DiceLoss(nn.Module):
+    """
+    Added Dice Loss for IoU improvement
+    """
     def __init__(self, smooth=1.0):
         super(DiceLoss, self).__init__()
         self.smooth = smooth
@@ -202,6 +206,9 @@ def compute_class_weights(dataset, num_classes=7):
 
     total = class_counts.sum()
     class_weights = total / (num_classes * class_counts + 1e-6)
+    """
+    Adjusted weights for a more balanced learning
+    """
     class_weights[0] *= 1.5
     class_weights[2] *= 1.5
     class_weights[4] *= 2.0 
@@ -214,6 +221,9 @@ def train_segformer(train_dir, valid_dir, num_classes=7, image_size=(224,224), b
     Loads data and model.
     Trains and validates the model.
     Logs the results into a CSV file.
+    The directories are not accurate since the model is already trained.
+    This is for submission purposes
+    If you want to train your own model update the directories and add your own config and model file. 
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -224,7 +234,6 @@ def train_segformer(train_dir, valid_dir, num_classes=7, image_size=(224,224), b
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=4)
     val_loader = DataLoader(val_dataset, batch_size=4, shuffle=False, num_workers=4)
 
-    # Load config and weights from safetensors
     config = SegformerConfig.from_json_file("classification_folder/models/b2-ade-512-512/config.json")
     
     model = SegformerForSemanticSegmentation.from_pretrained(
@@ -233,31 +242,28 @@ def train_segformer(train_dir, valid_dir, num_classes=7, image_size=(224,224), b
         local_files_only=True,
         ignore_mismatched_sizes=True
     )
-    
-    ### USED FOR .safetensors file
-    #state_dict = load_file("classification_folder/models/mit-b0/deepglobe.safetensors")
-    #model = SegformerForSemanticSegmentation(config)
-    #model.load_state_dict(state_dict)
+
     model.to(device)
 
+    # calculate class weights
     class_weights = compute_class_weights(train_dataset, num_classes=num_classes).to(device)
-    #class_weights = torch.tensor([1.0, 1.0, 1.0, 1.0, 1.2, 1.3, 0.1]).to(device)
 
-    
+    # calculate losses (dice, focal, and cross entropy)
     criterion = nn.CrossEntropyLoss(weight=class_weights, ignore_index=255, label_smoothing=0.15)
     dice_loss_func = DiceLoss()
     focal_loss_func = FocalLoss(alpha=1.0, gamma=2.0)
 
+    # declares optimizer and schduler for learning rate
     optimizer = optim.AdamW(model.parameters(), lr=5e-5)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimizer,
-        mode='max',        # We're maximizing validation mean IoU
-        factor=0.5,        # Reduce LR by 50%
-        patience=3,        # Wait 3 epochs of no improvement
+        mode='max',        # maximizing validation mean IoU
+        factor=0.5,        # reduce LR by 50%
+        patience=3,        # wait 3 epochs of no improvement
         verbose=True
     )
 
-    # CSV setup
+    # CSV output setup for visualization
     stat_folder = 'classification_folder/model_statistics/'
     with open(stat_folder + f"training_metrics_{MODEL_NAME}_{epochs}_epochs.csv", mode="w", newline="") as file:
         writer = csv.writer(file)
@@ -284,6 +290,7 @@ def train_segformer(train_dir, valid_dir, num_classes=7, image_size=(224,224), b
                 dice_loss = dice_loss_func(upsampled_logits, masks)
                 focal_loss = focal_loss_func(upsampled_logits, masks)
                 
+                # apply focal loss after epoch 10
                 if epoch < 10:
                     loss = 0.5 * dice_loss + 0.5 * ce_loss
                 else:
@@ -352,6 +359,7 @@ def train_segformer(train_dir, valid_dir, num_classes=7, image_size=(224,224), b
             row = [epoch+1, mean_acc] + list(mean_iou) + [val_mean_iou, avg_loss]
             writer.writerow(row)
             scheduler.step(val_mean_iou)
+            # saveing the best mdoel with hgihest IoU
             if val_mean_iou > best_iou:
                 best_iou = val_mean_iou
                 torch.save(model.state_dict(), f"best_model_{MODEL_NAME}.pth")
