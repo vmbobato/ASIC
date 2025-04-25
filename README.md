@@ -36,7 +36,7 @@ This project is a web-based application that allows users to upload satellite im
 
 ## Dataset
 
-.
+The [dataset](https://datasetninja.com/deepglobe) is already divided into train, valid, and test directories where inside each there is a **img/** and **ann/** directories. The **img/** contains the staellite images used and the **ann/** contains JSON files for each satellite image. The JSON files contain bitmaps for each masks that need to be converted. The notebook **convert_masks.ipynb** converts these bitmaps into a mask for each file where each pixel is mapped into a class. It outputs an **np.array()** of size (H, W) for each iamge. The notebook creates a new folder "DeepGlobe_Converted_Dataset" and performs a train/valid split. 
 
 ---
 
@@ -47,7 +47,7 @@ Clone this repository into your desired location.
 git clone https://github.com/ASIC.git
 ```
 
-Download [b2-ade_30_epochs.pth](https://huggingface.co/vmbobato/ASIC/tree/main) from this HuggingFace repository and place it inside **classification_folder/model**
+Download [b2-ade_30_epochs.pth](https://huggingface.co/vmbobato/ASIC/tree/main) from this HuggingFace repository and place it inside **classification_folder/model** folder. 
 
 Go to the repository location.
 
@@ -58,7 +58,7 @@ cd ASIC/
 Install requirements.
 
 ```
-pip install -r requiremnts.txt
+pip install -r requirements.txt
 ```
 
 Run the WebApp. 
