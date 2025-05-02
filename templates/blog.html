@@ -41,32 +41,91 @@
             
             <section class="blog-section">
                 <h2>Overview</h2>
-                <p> Measuring the size of land areas like cities, forests, and ice formations is challenging, especially when 
-                    accurate data over time is required. Our project aims to use AI and satellite imagery to automate this process.
-                    By leveraging image recognition technology, our system will detect and classify different land types—urban 
-                    areas, forests, ice, and farmland—directly from satellite images. AI for Satellite Image Classification is a 
-                    software project that uses deep learning for pixel-level classification of satellite imagery. Its main goal 
-                    is to determine the proportion of various land types in an image by performing image segmentation and 
-                    calculating their relative area coverage. That could make this tool useful for anyone from city planners 
-                    monitoring urban growth to environmental researchers tracking deforestation or ice melting.</p>
+                <p> Measuring the size of land areas like cities, forests, and ice formations is challenging, 
+                    especially when you need accurate data over time. Our project aims to use AI and satellite 
+                    imagery to automate that process. By leveraging image recognition technology, our system 
+                    can detect and classify different land types, like urban areas, forests, farmland, and ice, 
+                    directly from satellite images. </p>
+                <p> AI for Satellite Image Classification (ASIC) is a software project that uses deep learning to 
+                    do pixel-level classification of satellite images. The main goal is to figure out what 
+                    percentage of an image is covered by each land type by segmenting it and calculating the 
+                    area of each class. This could be useful for a wide range of people, like city planners 
+                    tracking urban growth or environmental researchers monitoring deforestation and melting 
+                    ice.</p>
             </section>
         
             <section class="blog-section">
                 <h2>Motivation</h2>
-                <p>
-                    Land use maps are essential for informed decision making in fields like urban planning, agriculture, and 
-                    environmental science. City planners rely on up to date area measurements to manage infrastructure, zoning, 
-                    and services. Agricultural managers need to monitor crop rotations and estimate yields. Environmental researchers 
-                    track deforestation, wetlands loss, and ice meltings. These people could find a fine-tuned model for their
-                    images useful.
+                <p> Land use maps are essential for informed decision making in fields like urban planning, 
+                    agriculture, and environmental science. City planners rely on up-to-date area measurements 
+                    to manage infrastructure, zoning, and services. Agricultural managers need to monitor crop 
+                    rotations and estimate yields. Environmental researchers track deforestation, wetlands loss, 
+                    and ice melting. These people could find a fine-tuned model for their images useful.
+                </p>
+                <p> Traditional mapping is often done yearly, which is not fast enough. Planners need quicker 
+                    updates to protect areas. Our solution is AI-powered pixel segmentation. It works on satellite 
+                    images to create 7-class land masks, automating the task. Urban expansion in particular is a 
+                    big reason why this kind of tool is needed. According to the United Nations, more than half of 
+                    the world’s population lived in cities by 2010, and that number is expected to reach 60% by 
+                    2025. As urban populations grow and densities drop, urban land area is projected to more 
+                    than triple. By providing clear and accurate land type breakdowns from satellite images, 
+                    ASIC can help monitor and potentially manage these changes more responsibly.
                 </p>
             </section>            
         
             <section class="blog-section">
                 <h2>Related Work</h2>
-                <p>...</p>
+                <p>This is a project that has been done before, the image segmentation part at least. Where we 
+                    add to it is by taking these classification models and applying them in a real AI software tool 
+                    that gives users useful outputs, like the percentage of land types in a satellite image and the 
+                    size of those areas in square meters</p>
+                <p>
+                    For training and testing, there are a few common datasets used, like DeepGlobe, EuroSat, 
+                    and Sen2Land. These datasets include different types of land use and come with correct 
+                    segmentation masks. We ended up using the DeepGlobe dataset, which we will talk more 
+                    about later.
+                </p>
+                <p>
+                    To figure out the best way to segment the satellite images, we looked into different models 
+                    and datasets that have been used in similar projects and that we thought could be useful for 
+                    ours. 
+                </p>
+                <p>
+                    One of the earliest and most well-known CNN models is U-Net. It uses a U-shaped 
+                    architecture with skip connections to help preserve spatial details during segmentation. It is a 
+                    solid baseline that works well in many cases, but it tends to struggle with thin or detailed 
+                    objects and has trouble capturing the bigger picture in large images. We did not test this one 
+                    though. 
+                </p>
+                <p>
+                    DeepLabV3+ is another CNN-based model that is better at capturing features at different 
+                    scales. It produces sharp segmentation edges, and we did test this one (we will talk more 
+                    about that later). Some of the issues we had with it were that even though it gave pretty 
+                    good segmentation, it was hard to get accurate classification of the different land areas
+                </p>
             </section>
-        
+            <section class="blog-section">
+                <h2>Transformers</h2>
+                <p>
+                    We also looked at some transformer models that have recently been used for segmentation 
+                    tasks, and are probably the most promising overall.
+                </p>
+                <p>
+                    SegFormer is a lightweight transformer that performed really well in our tests. It strikes a 
+                    nice balance between speed and accuracy, and does not need positional encoding, which 
+                    makes it easier to train and more flexible.
+                </p>
+                <p>
+                    Swin-Unet is another transformer-based model, built like U-Net but with a transformer 
+                    backbone. We did not test this one, but it's often mentioned in related work
+                </p>
+                <p>
+                    We did test the SAM2 model from Meta. It did not perform as well out-of-the-box for our use 
+                    case. It had some success in auto mode, but not enough to rely on without more fine-tuning. 
+                    We also had trouble getting it to capture everything in the image and to correctly classify the 
+                    segmented areas.
+                </p>
+            </section>
             <section class="blog-section">
                 <h2>Problem Set-Up</h2>
                 <p>
@@ -93,14 +152,26 @@
                     use case. The models we tested included SAM2, DeepLabV3+ with a ResNet50 encoder, and SegFormerB2.
                 </p>
                 <p>
+                    Our initial plan was to find the best-performing model, fine-tune it with a dataset we found 
+                    online, and then use it to output land type percentages and calculate the areas in square 
+                    meters.
+                </p>
+                <p>
                     We landed on the SegFormerB2, because of it's pixel classification capabilities and overall precision. We tried to combine SAM2
                     and DeepLabV3+ with a ResNet50 encoder, where we first segmented an image and then labeled the segmented areas, but the SegFormerB2
                     overall performed better. Next step was to fine-tune it using our satellite image dataset. We adapted the training process 
                     to better fit the kind of images we were dealing with and the specific land-type labels we wanted the model to learn.
                 </p>
                 <p>
-                    After training, we used the model to segment new satellite images. From those segmentation maps, we could then calculate the 
-                    percentage of each land type in the image, giving us the kind of output that's actually useful.
+                    Once we selected the model, we fine-tuned it using our satellite image dataset. We adapted 
+                    the training process to fit the types of images we were working with and the specific 
+                    land-type labels we wanted the model to learn.
+                </p>
+                <p>
+                    After training, we used the model to segment new satellite images. From the segmentation 
+                    maps, we calculated what percentage of the image each land type covered and from that, 
+                    estimated the actual area in square meters. This gave us exactly the kind of useful output we 
+                    were aiming for.
                 </p>
             </section>            
         
@@ -131,32 +202,57 @@
             <section class="blog-section">
                 <h2>Implementation</h2>
                 <p>
-                    For the model, we used <strong>SegFormer B2</strong>, which is a transformer-based architecture that comes 
-                    pretrained on the ADE20K dataset. This were the model that performed best as a baseline, especially when it 
-                    came to pixel-level accuracy. We trained it with an input size of 512x512 and used a batch size of 4.
+                    We ended up using SegFormer B2 as our base model. It is a transformer-based architecture 
+                    that comes pretrained on the ADE20K dataset, and it gave us the best results overall, 
+                    especially when it came to pixel-level accuracy. We trained it on images sized 512×512, with 
+                    a batch size of 4. 
                 </p>
                 <p>
-                    We set up a custom data pipeline that converted our RGB mask images into class labels that the model could 
-                    learn from. To help the model generalize better, we added some standard data augmentations during training, 
-                    things like flipping, rotating, color jitter, and gaussian blur.
+                    To make the data work for training, we built a pipeline that converted the RGB segmentation 
+                    masks into class labels the model could actually learn from. On top of that, we added some 
+                    basic data augmentations like flipping, rotating, color jitter, and gaussian blur. This was to 
+                    help the model generalize better and not just memorize the training set. 
                 </p>
                 <p>
-                    We did combination of three loss types: Cross Entropy, Dice Loss, and Focal Loss. The final loss formula looked like this:
+                    For the loss function, we did not rely on just one type. Instead, we combined Cross Entropy, 
+                    Dice Loss, and Focal Loss, because each one helps in a different way. Cross Entropy 
+                    handles general classification, Dice is good for imbalanced data, and Focal puts more focus 
+                    on the hard-to-classify pixels, which made the loss function look like this:
                 </p>
                 <p><code>Loss = 0.33 * Dice + 0.33 * CrossEntropy + 0.34 * Focal</code></p>
                 <p>
-                    Training-wise, we started with general optimization and added some checks to avoid overfitting. If the model didn't improve 
-                    for 3 epochs, we reduced the learning rate, and then had early stopping after reducing the learning rate.
+                    When training, we kept things pretty straightforward. We did some early stopping and 
+                    lowered the learning rate if the model did not improve after 3 epochs. To evaluate how well 
+                    things were going, we looked at metrics like pixel accuracy, IoU for each class, mean IoU, 
+                    and class coverage. We saved the model checkpoint that had the highest mean IoU.
+                </p>
+                <p>
+                    From that we output the image and calculate the percentage of each land type in the image 
+                    using a simple coverage function and then how much this would correspond to in square 
+                    meters if the user selected this function.
                 </p>
             </section>            
         
             <section class="blog-section">
                 <h2>Experimental Results</h2>
                 <p>
-                    We evaluated the model's performance using both visual inspection and quantitative metrics like pixel accuracy, Intersection-over-Union (IoU) for each class, mean IoU, and class coverage. The best model checkpoint was saved based on the highest mean IoU score.
+                    We evaluated the model using both visual outputs and metrics like pixel accuracy, IoU, mean 
+                    IoU, and class coverage. Overall, the model did okay, but the results were not amazing. We 
+                    had a bit of an imbalanced dataset too. With some land types like agriculture and rangeland 
+                    showed up in most of the images, so the model learned those better. Other classes like 
+                    water, forest, and urban areas were harder for it to get right, since they appeared less often
                 </p>
                 <p>
-                    Below are some graphs we generated that show how the model performed across different training epochs.
+                    You can see in the IoU-per-class graph that agriculture and rangeland performed the best, 
+                    while forest and water stayed pretty low. Urban and barren land were somewhere in between 
+                    but not super consistent. 
+                </p>
+                <p>
+                    The pixel accuracy went above 70%, which is decent, but accuracy could definitely be 
+                    improved. The mean IoU ended up hovering around 25–26%. We also built some visual 
+                    tools to actually look at the model outputs. These helped us confirm that large, clearly 
+                    defined areas were segmented well, but smaller or mixed regions were still tricky for the 
+                    model. 
                 </p>
                 <div style="display: flex; justify-content: center; margin: 20px 0;">
                     <img src="{{ url_for('static', filename='charts.png') }}" alt="Training Performance Charts" style="max-width: 100%; border-radius: 8px;">
@@ -165,17 +261,30 @@
         
             <section class="blog-section">
                 <h2>Demo</h2>
-                <p>Check out the <a href="/demo">Demo</a> section of this site to try the ASIC model in action. You can upload satellite images and view land type segmentation and percentage breakdown in real-time.</p>
+                <p>
+                    You can check out the <a href="/demo">Demo</a> of the ASIC model in action. You upload a satellite image, and 
+                    the model will segment it and show you a breakdown of the land types, including what 
+                    percentage of the image is covered by each type.
+                </p>
             </section>
         
             <section class="blog-section">
                 <h2>Conclusion</h2>
                 <p>
-                    ASIC shows that modern image segmentation models can be adapted to work well with satellite imagery. The software
-                    can break down land types in an image and give useful stats about their area. There's still room to improve, 
-                    especially in terms of accuracy, but the current results are a solid starting point. We would definitely need to 
-                    get better IOU and pixel accuracy if this was something that should be implementated for city-, forest-, farmland- 
-                    monitoring.
+                    ASIC shows that modern image segmentation models can be adapted to work pretty well 
+                    with satellite images. Our software can break down an image into land types and give useful 
+                    stats like percentage coverage and area in square meters. That alone could be helpful for 
+                    people working with things like urban planning or environmental monitoring. 
+                </p>
+                <p>
+                    That said, there is still a lot of room to improve. One big challenge is that satellite images 
+                    often have blurry or overlapping land types, and there are not always clear boundaries 
+                    between classes. This makes it harder for the model to be super accurate, especially when 
+                    some classes appear way more than others in the dataset. 
+                </p>
+                <p>
+                    Our current model works well in the web app and gives decent results. But if this were to be 
+                    used professionally, we would need to boost the IoU and pixel accuracy for all classes
                 </p>
             </section> 
             
