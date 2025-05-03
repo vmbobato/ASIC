@@ -1,3 +1,8 @@
+"""
+This module implements a Segformer-based semantic segmentation model for land classification.
+It includes dataset handling, loss functions, training utilities, and evaluation metrics.
+"""
+
 import os
 import csv
 import numpy as np
@@ -34,7 +39,13 @@ id2label = {
 
 def rgb_to_class(mask_rgb):
     """
-    Converts RGB color-coded segmentation masks (like [0,255,255]) into class index maps (e.g., 0, 1, 2...).
+    Converts RGB color-coded segmentation masks into class index maps.
+
+    Args:
+        mask_rgb (np.array): A 3D numpy array of shape (H, W, 3) containing RGB values
+
+    Returns:
+        np.array: A 2D numpy array of shape (H, W) containing class indices
     """
     color_to_class = {
         (0, 255, 255): 0,
@@ -53,10 +64,24 @@ def rgb_to_class(mask_rgb):
 
 class SegmentationDataset(Dataset):
     """
-    Loads image/mask pairs for training.
-    Used by PyTorch DataLoader for batching.
+    PyTorch Dataset class for loading and preprocessing image-mask pairs for semantic segmentation.
+    
+    Attributes:
+        root_dir (str): Directory containing the dataset
+        image_size (tuple): Target size for resizing images
+        files (list): List of image filenames
+        img_transform (Compose): Image transformation pipeline
+        mask_transform (Resize): Mask transformation
     """
     def __init__(self, root_dir, image_size=(224, 224), augment=False):
+        """
+        Initialize the dataset.
+
+        Args:
+            root_dir (str): Directory containing the dataset
+            image_size (tuple): Target size for resizing images
+            augment (bool): Whether to apply data augmentation
+        """
         self.root_dir = root_dir
         self.image_size = image_size
         self.files = sorted([f for f in os.listdir(root_dir) if f.endswith("_sat.jpg")])
@@ -85,13 +110,22 @@ class SegmentationDataset(Dataset):
 
     def __len__(self):
         """
-        Number of Training samples
+        Returns the total number of samples in the dataset.
+
+        Returns:
+            int: Number of samples
         """
         return len(self.files)
 
     def __getitem__(self, idx):
         """
         Loads and transforms a single image-mask pair.
+
+        Args:
+            idx (int): Index of the sample to load
+
+        Returns:
+            tuple: (image, mask) where both are torch tensors
         """
         img_name = self.files[idx]
         mask_name = img_name.replace("_sat.jpg", "_mask.png")
@@ -111,13 +145,34 @@ class SegmentationDataset(Dataset):
 
 class DiceLoss(nn.Module):
     """
-    Added Dice Loss for IoU improvement
+    Dice Loss implementation for semantic segmentation.
+    Dice Loss is particularly useful for imbalanced datasets as it focuses on the overlap
+    between predicted and ground truth masks.
+
+    Attributes:
+        smooth (float): Smoothing factor to avoid division by zero
     """
     def __init__(self, smooth=1.0):
+        """
+        Initialize the Dice Loss.
+
+        Args:
+            smooth (float): Smoothing factor to avoid division by zero
+        """
         super(DiceLoss, self).__init__()
         self.smooth = smooth
 
     def forward(self, inputs, targets):
+        """
+        Compute the Dice Loss.
+
+        Args:
+            inputs (torch.Tensor): Model predictions
+            targets (torch.Tensor): Ground truth masks
+
+        Returns:
+            torch.Tensor: Computed Dice Loss
+        """
         # Convert model output to probabilities
         inputs = torch.softmax(inputs, dim=1) 
 
@@ -135,15 +190,40 @@ class DiceLoss(nn.Module):
 
 class FocalLoss(nn.Module):
     """
-    Added focal loss for IoU improvement
+    Focal Loss implementation for semantic segmentation.
+    Focal Loss helps address class imbalance by down-weighting easy examples
+    and focusing on hard examples.
+
+    Attributes:
+        alpha (float): Weighting factor for positive samples
+        gamma (float): Focusing parameter
+        reduction (str): Reduction method for the loss
     """
     def __init__(self, alpha=1, gamma=2, reduction='mean'):
+        """
+        Initialize the Focal Loss.
+
+        Args:
+            alpha (float): Weighting factor for positive samples
+            gamma (float): Focusing parameter
+            reduction (str): Reduction method for the loss
+        """
         super(FocalLoss, self).__init__()
         self.alpha = alpha
         self.gamma = gamma
         self.reduction = reduction
 
     def forward(self, inputs, targets):
+        """
+        Compute the Focal Loss.
+
+        Args:
+            inputs (torch.Tensor): Model predictions
+            targets (torch.Tensor): Ground truth masks
+
+        Returns:
+            torch.Tensor: Computed Focal Loss
+        """
         ce_loss = F.cross_entropy(inputs, targets, reduction='none')
         pt = torch.exp(-ce_loss)
         focal_loss = self.alpha * (1 - pt) ** self.gamma * ce_loss
@@ -157,7 +237,14 @@ class FocalLoss(nn.Module):
 
 def class_pixel_coverage(mask, num_classes=7):
     """
-    Calculates how much of the image belongs to each class, as a percentage.
+    Calculates the percentage coverage of each class in a segmentation mask.
+
+    Args:
+        mask (np.array): Segmentation mask array
+        num_classes (int): Number of classes in the segmentation
+
+    Returns:
+        dict: Dictionary mapping class indices to their coverage percentages
     """
     total_pixels = mask.size
     coverage = {}
@@ -169,8 +256,15 @@ def class_pixel_coverage(mask, num_classes=7):
 
 def calculate_iou(pred, true, num_classes=7):
     """
-    Computes Intersection over Union for each class.
-    Used to evaluate how well the model is segmenting each class.
+    Computes Intersection over Union (IoU) for each class.
+
+    Args:
+        pred (np.array): Predicted segmentation mask
+        true (np.array): Ground truth segmentation mask
+        num_classes (int): Number of classes in the segmentation
+
+    Returns:
+        list: IoU scores for each class
     """
     ious = []
     for class_id in range(num_classes):
@@ -186,7 +280,14 @@ def calculate_iou(pred, true, num_classes=7):
 
 def pixel_accuracy(pred, true):
     """
-    Calculates how many pixels the model predicted correctly.
+    Calculates the pixel-wise accuracy of the segmentation.
+
+    Args:
+        pred (np.array): Predicted segmentation mask
+        true (np.array): Ground truth segmentation mask
+
+    Returns:
+        float: Pixel accuracy score
     """
     correct = (pred == true).sum()
     total = pred.size
@@ -195,7 +296,14 @@ def pixel_accuracy(pred, true):
 
 def compute_class_weights(dataset, num_classes=7):
     """
-    Function to calculate inverse frequency-based weights for each class 
+    Computes class weights based on inverse frequency to handle class imbalance.
+
+    Args:
+        dataset (Dataset): Training dataset
+        num_classes (int): Number of classes in the segmentation
+
+    Returns:
+        torch.Tensor: Class weights tensor
     """
     class_counts = np.zeros(num_classes, dtype=np.int64)
 
@@ -218,12 +326,19 @@ def compute_class_weights(dataset, num_classes=7):
 
 def train_segformer(train_dir, valid_dir, num_classes=7, image_size=(224,224), batch_size=4, epochs=10):
     """
-    Loads data and model.
-    Trains and validates the model.
-    Logs the results into a CSV file.
-    The directories are not accurate since the model is already trained.
-    This is for submission purposes
-    If you want to train your own model update the directories and add your own config and model file. 
+    Trains a Segformer model for semantic segmentation.
+
+    Args:
+        train_dir (str): Directory containing training data
+        valid_dir (str): Directory containing validation data
+        num_classes (int): Number of classes in the segmentation
+        image_size (tuple): Target size for resizing images
+        batch_size (int): Batch size for training
+        epochs (int): Number of training epochs
+
+    Note:
+        The directories in this function are for submission purposes.
+        To train your own model, update the directories and add your own config and .pth files.
     """
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -359,7 +474,7 @@ def train_segformer(train_dir, valid_dir, num_classes=7, image_size=(224,224), b
             row = [epoch+1, mean_acc] + list(mean_iou) + [val_mean_iou, avg_loss]
             writer.writerow(row)
             scheduler.step(val_mean_iou)
-            # saveing the best mdoel with hgihest IoU
+            # saveing the best mdoel with hgihest mIoU
             if val_mean_iou > best_iou:
                 best_iou = val_mean_iou
                 torch.save(model.state_dict(), f"best_model_{MODEL_NAME}.pth")
