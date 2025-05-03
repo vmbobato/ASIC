@@ -47,8 +47,15 @@ transform = T.Compose([
 
 def compute_coverage(mask : np.array, num_classes=7) -> dict:
     """
-    Function to calculate coverage fo each class based on mask
-    Return percentage for each class in a dict {'urban' : 76.54}
+    Calculate the percentage coverage of each land class in a segmentation mask.
+
+    Args:
+        mask (np.array): A 2D numpy array containing class IDs for each pixel
+        num_classes (int, optional): Number of classes in the segmentation. Defaults to 7.
+
+    Returns:
+        dict: A dictionary mapping class names to their percentage coverage in the image.
+              Example: {'urban_land': 25.5, 'agriculture_land': 30.2, ...}
     """
     total_pixels = mask.size
     coverage = {}
@@ -59,7 +66,17 @@ def compute_coverage(mask : np.array, num_classes=7) -> dict:
     return coverage
 
 
-def get_masks(image_path : str):
+def get_masks(image_path : str) -> np.array:
+    """
+    Generate a segmentation mask for an input image using the Segformer model.
+
+    Args:
+        image_path (str): Path to the input image file
+
+    Returns:
+        np.array: A 2D numpy array containing class IDs for each pixel in the image.
+                 The array has the same dimensions as the input image.
+    """
     image = Image.open(image_path).convert("RGB")
     orig_size = image.size  # (W, H)
     input_tensor = transform(image).unsqueeze(0).to(device)
@@ -75,7 +92,25 @@ def get_masks(image_path : str):
         pred_mask = upsampled_logits.argmax(dim=1)[0].cpu().numpy()
     return pred_mask
 
-def run_analysis(mask, img_name) -> tuple[str, str]:
+def run_analysis(mask : np.array, img_name : str) -> tuple[str, str]:
+    """
+    Analyze a segmentation mask and generate a visual representation and coverage statistics.
+
+    Args:
+        mask (np.array): A 2D numpy array containing class IDs for each pixel
+        img_name (str): Original name of the input image file
+
+    Returns:
+        tuple[str, str]: A tuple containing:
+            - str: A formatted string containing coverage statistics for each class
+            - str: The filename of the generated segmented image
+
+    The function:
+    1. Computes coverage statistics for each land class
+    2. Generates a color-coded visualization of the segmentation
+    3. Saves the visualization to the output directory
+    4. Returns both the analysis text and the output filename
+    """
     file_name_only = os.path.splitext(img_name)[0]
     output_filename = f"{file_name_only}_segmented.png"
     output = ''
@@ -84,7 +119,7 @@ def run_analysis(mask, img_name) -> tuple[str, str]:
     for label, percent in coverage.items():
         if percent != 0:
             label_formatted = label.replace('_', ' ').title()
-            output += f"\n> {label_formatted}: {percent:.2f}% - Total Area: {(percent/100 * 1498176):.2f} meter-squared (m2)"
+            output += f"\n> {label_formatted}: {percent:.2f}% - Total Area: {(percent/100 * 1498176):.2f} meter-squared (m2)" # based on 1 px = 0.5 m
     h, w = mask.shape
     color_mask = np.zeros((h, w, 3), dtype=np.uint8)
     for class_id, color in class_colors.items():
